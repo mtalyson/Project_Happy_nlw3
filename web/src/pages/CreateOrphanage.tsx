@@ -1,14 +1,18 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useState, ChangeEvent } from "react";
+import { useHistory } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 
 import { FiPlus } from "react-icons/fi";
 
 import Sidebar from "../components/Sidebar";
 import mapIcon from "../utils/mapIcon";
+import api from "../services/api";
 
 import '../styles/pages/create_orphanage.css';
 
 export default function OrphanagesMap() {
+
+  const history = useHistory()
 
   const [position, setPosition] = useState({ latitude: 0, longitude: 0 });
   const [name, setName] = useState('');
@@ -16,6 +20,8 @@ export default function OrphanagesMap() {
   const [instructions, setInstructions] = useState('');
   const [opening_hours, setOpeningHours] = useState('');
   const [open_on_weekends, setOpenOnWeekends] = useState(true);
+  const [images, setImages] = useState<File[]>([]);
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
   
   function AddMarkerToClick() {
 
@@ -46,20 +52,45 @@ export default function OrphanagesMap() {
     )
   }
 
-  function handleSubmit(event: FormEvent) {
+  function handleSelectImages(event: ChangeEvent<HTMLInputElement>) {
+    if (!event.target.files){
+      return;
+    }
+
+    const selectedImages = Array.from(event.target.files);
+
+    setImages(selectedImages);
+
+    const selectedImagesPreview = selectedImages.map( image => {
+      return URL.createObjectURL(image);
+    });
+
+    setPreviewImages(selectedImagesPreview)
+  }
+
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
     const { latitude, longitude } = position;
   
-    console.log({
-      name,
-      about,
-      latitude,
-      longitude,
-      instructions,
-      opening_hours,
-      open_on_weekends,
+    const data = new FormData();
+
+    data.append('name', name);
+    data.append('about', about);
+    data.append('latitude', String(latitude));
+    data.append('longitude', String(longitude));
+    data.append('instructions', instructions);
+    data.append('opening_hours', opening_hours);
+    data.append('open_on_weekends', String(open_on_weekends));
+
+    images.forEach(images => {
+      data.append('images', images);
     })
+
+    await api.post('orphanages', data);
+
+    alert('Cadastro Realizado com Sucesso!');
+    history.push('/app')
   }
 
   return (
@@ -105,12 +136,20 @@ export default function OrphanagesMap() {
 
             <div className="input-block">
               <label htmlFor="images">Fotos</label>
-              <div className="uploaded-image">
+
+              <div className="images-container">
+                {previewImages.map(image => {
+                  return (
+                    <img key={image} src={image} alt={name}/>
+                  )
+                })}
+
+                <label htmlFor="image[]" className="new-image">
+                  <FiPlus size={24} color="#15b6d6" />
+                </label>
               </div>
 
-              <button type="button" className="new-image">
-                <FiPlus size={24} color="#15b6d6" />
-              </button>
+              <input multiple onChange={handleSelectImages} type="file" id="image[]"/>
             </div>
           </fieldset>
 
