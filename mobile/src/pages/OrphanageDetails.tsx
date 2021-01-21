@@ -122,11 +122,6 @@ export default function OrphanageDetails() {
               </View>
             )}
         </View>
-
-        {/* <RectButton style={styles.contactButton} onPress={() => {}}>
-          <FontAwesome name="whatsapp" size={24} color="#FFF" />
-          <Text style={styles.contactButtonText}>Entrar em contato</Text>
-        </RectButton> */}
       </View>
     </ScrollView>
   )
