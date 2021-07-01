@@ -1,6 +1,6 @@
-# :baby: Projeto Happy: NLW3
+# :baby: Projeto Happy
 
-Aplicação de listagem de orfanatos construída durante o evento Next Level Week 3.0 promovido pela empresa Rocketseat, utilizando ReactJS.
+Aplicação social de listagem e cadastro de orfanatos.
 
 ## :computer: Screenshots (Web)
 
